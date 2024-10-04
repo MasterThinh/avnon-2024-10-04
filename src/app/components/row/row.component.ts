@@ -22,17 +22,17 @@ export class RowComponent {
 
   @ViewChildren(CellComponent) cellChildren!: QueryList<CellComponent>;
 
-  add = input<boolean>(false)
-  addCategory = output();
-  remove = input<boolean>(false)
-  removeCategory = output();
+  // add = input<boolean>(false)
+  // addCategory = output();
+  // remove = input<boolean>(false)
+  // removeCategory = output();
 
-  onAddCategory() {
-    this.addCategory.emit()
-  }
+  // onAddCategory() {
+  //   this.addCategory.emit()
+  // }
 
-  onRemoveCategory() {
-    this.removeCategory.emit()
-  }
+  // onRemoveCategory() {
+  //   this.removeCategory.emit()
+  // }
 
 }

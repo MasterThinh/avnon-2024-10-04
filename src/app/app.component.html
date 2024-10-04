@@ -6,8 +6,8 @@
     <div class="sm:col-span-1">
       <label for="from-date" class="block text-sm font-medium leading-6 text-gray-900">From Month</label>
       <div class="mt-2">
-        <input tabindex="-1" type="month" [(ngModel)]="fromDate" name="from-date"
-          id="from-date" autocomplete="given-name"
+        <input tabindex="-1" type="month" [(ngModel)]="fromDate" name="from-date" id="from-date"
+          autocomplete="given-name"
           class="block w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
       </div>
     </div>
@@ -15,8 +15,7 @@
     <div class="sm:col-span-1">
       <label for="to-date" class="block text-sm font-medium leading-6 text-gray-900">To Month</label>
       <div class="mt-2">
-        <input tabindex="-1" [(ngModel)]="toDate" type="month" name="to-date"
-          id="to-date" autocomplete="family-name"
+        <input tabindex="-1" [(ngModel)]="toDate" type="month" name="to-date" id="to-date" autocomplete="family-name"
           class="block w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
       </div>
     </div>
@@ -24,10 +23,9 @@
 
   @if (months().length > 0) {
   <div class="overflow-x-auto">
-    <table class="border-collapse border min-w-full border-slate-400 border-spacing-1">
+    <table class="border-collapse border min-w-full border-slate-400 border-spacing-1 h-1">
       <thead>
         <tr>
-          <th class="w-24 border border-slate-300 px-2"></th>
           <th class="w-64 border border-slate-300 px-2 text-left">Start Period V End Period V</th>
           @for (itemMonth of months(); track $index;) {
           <th class="border border-slate-300 px-2 text-right">{{itemMonth | date: 'MMMM y'}}</th>
@@ -38,31 +36,26 @@
 
       <tbody>
         <tr>
-          <td></td>
           <td colspan="100%" class="font-bold px-2 text-left">Income</td>
         </tr>
       </tbody>
 
       @for (itemParentCategory of incomeParentCategories(); track indexParentCategory; let indexParentCategory =
       $index) {
-      <tbody appParentCategory
-        (parentCategoryChange)="onIncomeParentCategoryChange($any($event), indexParentCategory)"
+      <tbody appParentCategory (parentCategoryChange)="onIncomeParentCategoryChange($any($event), indexParentCategory)"
         [parentCategory]="incomeParentCategories()[indexParentCategory]"
-        (removeCategory)="onRemoveInComeCategoryAtIndex($any($event), indexParentCategory)"
-        (removeParentCategory)="onRemoveInComeParentCategoryAtIndex(indexParentCategory)"
-        (addCategory)="onAddIncomeCategoryAtIndex($any($event), indexParentCategory)"
         [subTotalsParentCategory]="subTotalsIncomeParentCategories()[indexParentCategory]">
       </tbody>
       }
 
       <tbody>
-        <tr>
+        <!-- <tr>
           <td colspan="2">
             <button tabindex="-1" (click)="onAddIncomeParentCategory()"
               class="w-full bg-green-500 hover:bg-green-700 text-white font-bold px-2">+Parent
               Category (Income)</button>
           </td>
-        </tr>
+        </tr> -->
 
         <tr class="font-bold" appRow [row]="totalsIncomeParentCategories()"></tr>
 
@@ -75,7 +68,6 @@
       <!-- Expenses -->
       <tbody>
         <tr>
-          <td></td>
           <td colspan="100%" class="font-bold px-2 text-left">Expenses</td>
         </tr>
       </tbody>
@@ -83,24 +75,21 @@
 
       @for (itemParentCategory of expensesParentCategories(); track indexParentCategory; let indexParentCategory =
       $index) {
-      <tbody appParentCategory 
+      <tbody appParentCategory
         (parentCategoryChange)="onExpensesParentCategoryChange($any($event), indexParentCategory)"
         [parentCategory]="expensesParentCategories()[indexParentCategory]"
-        (removeCategory)="onRemoveExpensesCategoryAtIndex($any($event), indexParentCategory)"
-        (removeParentCategory)="onRemoveExpensesParentCategoryAtIndex(indexParentCategory)"
-        (addCategory)="onAddExpensesCategoryAtIndex($any($event), indexParentCategory)"
         [subTotalsParentCategory]="subTotalsExpensesParentCategories()[indexParentCategory]">
       </tbody>
       }
 
       <tbody>
-        <tr>
+        <!-- <tr>
           <td colspan="2">
             <button tabindex="-1" (click)="onAddExpensesParentCategory()"
               class="w-full bg-green-500 hover:bg-green-700 text-white font-bold px-2">+Parent
               Category (Expenses)</button>
           </td>
-        </tr>
+        </tr> -->
 
         <tr class="font-bold" appRow [row]="totalsExpensesParentCategories()"></tr>
 

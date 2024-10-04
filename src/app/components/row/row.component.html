@@ -1,4 +1,4 @@
-<td disabled="true" class="text-center border border-slate-300">
+<!-- <td disabled="true" class="text-center border border-slate-300">
 
   @if (add()) {
   <button tabindex="-1" (click)="onRemoveCategory()"
@@ -10,12 +10,7 @@
     class="w-8 bg-green-500 hover:bg-green-700 text-white font-bold px-1 mx-1 rounded-sm">+</button>
   }
 
-  <!-- @if (removeAll()) {
-    <button tabindex="-1" (click)="onRemoveALlCategory()"
-    class="bg-red-500 hover:bg-red-700 text-white font-bold px-2 mx-1 rounded-sm">-Parent Category</button>
-    } -->
-
-</td>
+</td> -->
 @for (itemCell of row(); track indexCell; let indexCell = $index) {
 <td class="border border-slate-300 text-right">
   <app-cell

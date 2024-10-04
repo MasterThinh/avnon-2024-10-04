@@ -226,7 +226,78 @@ export class AppService {
   moveArrow = signal<IMove | null>(null)
 
   updateMoveArrow(move: IMove) {
-    this.moveArrow.update(() => move)
+    this.moveArrow.update(() => move);
+  }
+
+  // applyAll = signal<string>('');
+  applyValueAllCell(applyAll: string) {
+    // this.applyAll.update(() => applyAll);
+
+    this.incomes.update((items => {
+      return items.map((itemParent, indexParent) => {
+        return itemParent.map((itemRow, indexRow) => {
+          return itemRow.map((itemCell, indexCell) => {
+            if (indexCell < itemRow.length - this.months().length) {
+              return itemCell
+            }
+
+            return {
+              ...itemCell,
+              value: applyAll
+            }
+          })
+        })
+      });
+    }))
+
+    this.expenses.update((items => {
+      return items.map((itemParent, indexParent) => {
+        return itemParent.map((itemRow, indexRow) => {
+          return itemRow.map((itemCell, indexCell) => {
+            if (indexCell < itemRow.length - this.months().length) {
+              return itemCell
+            }
+            return {
+              ...itemCell,
+              value: applyAll
+            }
+          })
+        })
+      });
+    }))
+
+  }
+
+  deleteRowOfParentAtIndex(indexParent: number, indexRow: number) {
+    if (indexParent < this.incomes().length) {
+      this.removeRowOfParentIncomeAtIndex(indexParent, indexRow)
+    } else {
+      this.removeRowOfParentExpensesAtIndex(indexParent % this.incomes().length, indexRow)
+    }
+  }
+
+  deleteParentAtIndex(indexParent: number) {
+    if (indexParent < this.incomes().length) {
+      this.removeParentIncomeAtIndex(indexParent)
+    } else {
+      this.removeParentExpensesAtIndex(indexParent % this.incomes().length)
+    }
+  }
+
+  insertRowOfParentAtIndex(indexParent: number, indexRow: number) {
+    if (indexParent < this.incomes().length) {
+      this.insertRowOfParentIncomeAtIndex(indexParent, indexRow + 1)
+    } else {
+      this.insertRowOfParentExpensesAtIndex(indexParent % this.incomes().length, indexRow + 1)
+    }
+  }
+
+  insertParentAtIndex(indexParent: number) {
+    if (indexParent < this.incomes().length) {
+      this.addIncomeParentCategory(indexParent + 1)
+    } else {
+      this.addExpensesParentCategory(indexParent % this.incomes().length + 1)
+    }
   }
 
   createCategoryRow(name = ''): ICell[] {
@@ -272,39 +343,42 @@ export class AppService {
 
   // Income
 
-  updateIncomesByIndex(categoryParent: Array<ICell[]>, indexCategoryParent: number) {
-    this.incomes.update(items => items.map((item, index) => indexCategoryParent === index ? categoryParent : item))
+  updateIncomesByIndex(categoryParent: Array<ICell[]>, indexParentOfIncome: number) {
+    this.incomes.update(items => items.map((item, index) => indexParentOfIncome === index ? categoryParent : item))
   }
 
-  addIncomeParentCategory() {
-    this.incomes.update(items => [
-      ...items,
-      this.createParentCategoryRows()
-    ]);
+  addIncomeParentCategory(indexParentOfIncome: number) {
+    this.incomes.update(
+      items => {
+        let addedParent = [...items];
+        addedParent.splice(indexParentOfIncome, 0, this.createParentCategoryRows())
+        return addedParent;
+      }
+    )
   }
 
-  addIncomeCategoryAtIndex(indexCategoryParent: number, indexItemCategory: number) {
+  insertRowOfParentIncomeAtIndex(indexParentOfIncome: number, indexRow: number) {
     this.incomes.update(
       items => items.map((item, index) => {
 
         let addedCategory = [...item];
-        addedCategory.splice(indexItemCategory, 0, this.createCategoryRow())
+        addedCategory.splice(indexRow, 0, this.createCategoryRow())
 
-        return indexCategoryParent === index ? addedCategory : item;
+        return indexParentOfIncome === index ? addedCategory : item;
       })
     )
   }
 
-  removeIncomeCategoryAtIndex(indexCategoryParent: number, indexItemCategory: number) {
+  removeRowOfParentIncomeAtIndex(indexParentOfIncome: number, indexRow: number) {
 
     let isRemoveParentCategory = false;
 
     this.incomes.update(
       items => items.map((item, index) => {
 
-        if (indexCategoryParent === index) {
+        if (indexParentOfIncome === index) {
           let removedCategory = [...item];
-          removedCategory.splice(indexItemCategory, 1)
+          removedCategory.splice(indexRow, 1)
 
           if (removedCategory.length === 0) {
             isRemoveParentCategory = true;
@@ -318,54 +392,57 @@ export class AppService {
     )
 
     if (isRemoveParentCategory) {
-      this.removeIncomeParentCategoryAtIndex(indexCategoryParent);
+      this.removeParentIncomeAtIndex(indexParentOfIncome);
     }
   }
 
-  removeIncomeParentCategoryAtIndex(indexCategoryParent: number) {
+  removeParentIncomeAtIndex(indexParentOfIncome: number) {
     this.incomes.update(
       items => items.filter((item, index) => {
-        return indexCategoryParent !== index;
+        return indexParentOfIncome !== index;
       })
     )
   }
 
   //Expenses 
 
-  updateExpensesByIndex(categoryParent: Array<ICell[]>, indexCategoryParent: number) {
-    this.expenses.update(items => items.map((item, index) => indexCategoryParent === index ? categoryParent : item))
+  updateExpensesByIndex(categoryParent: Array<ICell[]>, indexParentExpenses: number) {
+    this.expenses.update(items => items.map((item, index) => indexParentExpenses === index ? categoryParent : item))
   }
 
-  addExpensesParentCategory() {
-    this.expenses.update(items => [
-      ...items,
-      this.createParentCategoryRows()
-    ]);
+  addExpensesParentCategory(indexParentExpenses: number) {
+    this.expenses.update(
+      items => {
+        let addedParent = [...items];
+        addedParent.splice(indexParentExpenses, 0, this.createParentCategoryRows())
+        return addedParent;
+      }
+    )
 
   }
 
-  addExpensesCategoryAtIndex(indexCategoryParent: number, indexItemCategory: number) {
+  insertRowOfParentExpensesAtIndex(indexParentExpenses: number, indexRow: number) {
     this.expenses.update(
       items => items.map((item, index) => {
 
         let addedCategory = [...item];
-        addedCategory.splice(indexItemCategory, 0, this.createCategoryRow())
+        addedCategory.splice(indexRow, 0, this.createCategoryRow())
 
-        return indexCategoryParent === index ? addedCategory : item;
+        return indexParentExpenses === index ? addedCategory : item;
       })
     )
   }
 
-  removeExpensesCategoryAtIndex(indexCategoryParent: number, indexItemCategory: number) {
+  removeRowOfParentExpensesAtIndex(indexParentExpenses: number, indexRow: number) {
 
     let isRemoveParentCategory = false;
 
     this.expenses.update(
       items => items.map((item, index) => {
 
-        if (indexCategoryParent === index) {
+        if (indexParentExpenses === index) {
           let removedCategory = [...item];
-          removedCategory.splice(indexItemCategory, 1)
+          removedCategory.splice(indexRow, 1)
 
           if (removedCategory.length === 0) {
             isRemoveParentCategory = true;
@@ -379,14 +456,14 @@ export class AppService {
     )
 
     if (isRemoveParentCategory) {
-      this.removeExpensesParentCategoryAtIndex(indexCategoryParent);
+      this.removeParentExpensesAtIndex(indexParentExpenses);
     }
   }
 
-  removeExpensesParentCategoryAtIndex(indexCategoryParent: number) {
+  removeParentExpensesAtIndex(indexParentExpenses: number) {
     this.expenses.update(
       items => items.filter((item, index) => {
-        return indexCategoryParent !== index;
+        return indexParentExpenses !== index;
       })
     )
   }

@@ -17,28 +17,24 @@ export class ParentCategoryComponent {
   parentCategory = model.required<Array<ICell[]>>()
   subTotalsParentCategory = model.required<ICell[]>()
 
-  add = input<boolean>(false)
-  addCategory = output<number>();
-  remove = input<boolean>(false)
-  removeCategory = output<number>();
-  removeParent = input<boolean>(false)
-  removeParentCategory = output();
+  // removeParent = input<boolean>(false)
+  // removeParentCategory = output();
 
   // rowChildren = viewChildren<RowComponent>(RowComponent);
   @ViewChildren(`row`) rowChildren!:  QueryList<RowComponent>;
 
 
-  onAddCategoryAtIndex(indexItemCategory: number) {
-    this.addCategory.emit(indexItemCategory)
-  }
+  // onAddCategoryAtIndex(indexItemCategory: number) {
+  //   this.addCategory.emit(indexItemCategory)
+  // }
 
-  onRemoveCategoryAtIndex(indexItemCategory: number) {
-    this.removeCategory.emit(indexItemCategory)
-  }
+  // onRemoveCategoryAtIndex(indexItemCategory: number) {
+  //   this.removeCategory.emit(indexItemCategory)
+  // }
 
-  onRemoveParentCategoryAtIndex() {
-    this.removeParentCategory.emit()
-  }
+  // onRemoveParentCategoryAtIndex() {
+  //   this.removeParentCategory.emit()
+  // }
 
   onRowIncomeChange(evt: ICell[], indexItemCategory: number) {
     this.parentCategory.update(items => {

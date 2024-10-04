@@ -210,7 +210,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      this.parentCategoryChildren.toArray()[0].rowChildren.toArray()[0].cellChildren.toArray()[0].focus();
+      this.getCell(0, 0, 0).focus();
     }, 0);
   }
 
@@ -219,21 +219,21 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.appService.updateIncomesByIndex(evt, indexItemCategory);
   }
 
-  onAddIncomeCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-    this.appService.addIncomeCategoryAtIndex(indexParentCategory, indexItemCategory)
-  }
+  // onAddIncomeCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
+  //   this.appService.insertRowOfParentIncomeAtIndex(indexParentCategory, indexItemCategory)
+  // }
 
-  onRemoveInComeCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-    this.appService.removeIncomeCategoryAtIndex(indexParentCategory, indexItemCategory)
-  }
+  // onRemoveInComeCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
+  //   this.appService.removeRowOfParentIncomeAtIndex(indexParentCategory, indexItemCategory)
+  // }
 
-  onRemoveInComeParentCategoryAtIndex(indexParentCategory: number) {
-    this.appService.removeIncomeParentCategoryAtIndex(indexParentCategory)
-  }
+  // onRemoveInComeParentCategoryAtIndex(indexParentCategory: number) {
+  //   this.appService.removeIncomeParentCategoryAtIndex(indexParentCategory)
+  // }
 
-  onAddIncomeParentCategory() {
-    this.appService.addIncomeParentCategory();
-  }
+  // onAddIncomeParentCategory() {
+  //   this.appService.addIncomeParentCategory();
+  // }
 
   // Expenses
 
@@ -242,20 +242,20 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   }
 
-  onAddExpensesCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-    this.appService.addExpensesCategoryAtIndex(indexParentCategory, indexItemCategory)
-  }
+  // onAddExpensesCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
+  //   this.appService.insertRowOfParentExpensesAtIndex(indexParentCategory, indexItemCategory)
+  // }
 
-  onRemoveExpensesCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-    this.appService.removeExpensesCategoryAtIndex(indexParentCategory, indexItemCategory)
-  }
+  // onRemoveExpensesCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
+  //   this.appService.removeRowOfParentExpensesAtIndex(indexParentCategory, indexItemCategory)
+  // }
 
-  onRemoveExpensesParentCategoryAtIndex(indexParentCategory: number) {
-    this.appService.removeExpensesParentCategoryAtIndex(indexParentCategory)
-  }
+  // onRemoveExpensesParentCategoryAtIndex(indexParentCategory: number) {
+  //   this.appService.removeExpensesParentCategoryAtIndex(indexParentCategory)
+  // }
 
-  onAddExpensesParentCategory() {
-    this.appService.addExpensesParentCategory();
-  }
+  // onAddExpensesParentCategory() {
+  //   this.appService.addExpensesParentCategory(1);
+  // }
 
 }
