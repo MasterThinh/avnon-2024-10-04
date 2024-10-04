@@ -1,0 +1,25 @@
+<tr>
+  <td colspan="2">
+    <button tabindex="-1" (click)="onRemoveParentCategoryAtIndex()"
+      class="w-full bg-red-500 hover:bg-red-700 text-white font-bold px-2  rounded-sm">-Parent Category</button>
+  </td>
+</tr>
+@for (itemCategory of parentCategory(); track indexItemCategory; let
+  indexItemCategory =
+  $index) {
+
+  <tr #row appRow [add]="true" [remove]="true"
+    (removeCategory)="onRemoveCategoryAtIndex(indexItemCategory)"
+    (addCategory)="onAddCategoryAtIndex(indexItemCategory + 1)"
+    (rowChange)="onRowIncomeChange($any($event), indexItemCategory)"
+    [row]="parentCategory()[indexItemCategory]">
+  </tr>
+  }
+
+
+  <tr class="font-semibold" appRow [row]="subTotalsParentCategory()">
+  </tr>
+
+  <!-- <tr>
+    <td colspan="100%">&nbsp;</td>
+  </tr> -->

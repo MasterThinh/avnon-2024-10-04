@@ -1,0 +1,5 @@
+<input #inputCell class="w-full px-2 outline-blue-600" [disabled]="!cell().edit" [class.text-right]="cell().isNumber" type="text"
+  [readonly]="!isEditing()" (blur)="onChangeViewMode()" [(ngModel)]="input" (keydown.enter)="onChangeEditMode()"
+  [placeholder]="cell().isNumber ? '' : 'Name'"
+  (keydown)="onKeyDown($any($event))"
+  (dblclick)="onChangeEditMode()">
