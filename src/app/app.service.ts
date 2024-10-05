@@ -1,3 +1,4 @@
+import { CellService } from './components/cell/cell.service';
 import { Injectable, computed, effect, signal } from '@angular/core';
 import moment from 'moment';
 import { ICell, IMove, IRightClick } from './components/cell/cell.component';
@@ -6,6 +7,9 @@ import { ICell, IMove, IRightClick } from './components/cell/cell.component';
   providedIn: 'root'
 })
 export class AppService {
+
+  constructor(private cellService: CellService) {
+  }
 
   fromDate = signal<string>(`2024-01`);
   toDate = signal<string>(`2024-12`);
@@ -43,7 +47,6 @@ export class AppService {
   }, { allowSignalWrites: true })
 
   incomes = signal<Array<Array<ICell[]>>>([]);
-
   expenses = signal<Array<Array<ICell[]>>>([]);
 
   subTotalsIncomes = computed(() => {
@@ -62,7 +65,10 @@ export class AppService {
           }
         });
 
-      }, this.createTotalRow(`Sub Totals`))
+      }, this.createRowForParent(
+        { value: `Sub Totals`, disabled: true },
+        this.createCellsForMonth({ isNumber: true, disabled: true }
+        )))
     })
     return subTotalIncomes;
   })
@@ -82,7 +88,10 @@ export class AppService {
         }
       });
 
-    }, this.createTotalRow(`Income Total`))
+    }, this.createRowForParent(
+      { value: `Income Total`, disabled: true },
+      this.createCellsForMonth({ isNumber: true, disabled: true }
+      )))
 
     return totalsIncomes;
   })
@@ -103,14 +112,17 @@ export class AppService {
           }
         });
 
-      }, this.createTotalRow(`Sub Totals`))
+      }, this.createRowForParent(
+        { value: `Sub Totals`, disabled: true },
+        this.createCellsForMonth({ isNumber: true, disabled: true }
+        )))
     })
     return subTotalExpenses;
   })
 
   totalsExpenses = computed(() => {
     const totalsExpenses = this.subTotalsExpenses().reduce((acc, current) => {
-      return acc.map((item, index) => {
+      return acc.map((item: ICell, index: number) => {
 
         if (index < acc.length - this.months().length) {
           return item
@@ -123,7 +135,10 @@ export class AppService {
         }
       });
 
-    }, this.createTotalRow(`Total Expenses`))
+    }, this.createRowForParent(
+      { value: `Total Expenses`, disabled: true },
+      this.createCellsForMonth({ isNumber: true, disabled: true }
+      )))
 
     return totalsExpenses;
   })
@@ -175,7 +190,11 @@ export class AppService {
   }, { allowSignalWrites: true })
 
   profitLoss = computed(() => {
-    let profitLoss = this.createTotalRow(`Profit / Loss`);
+    let profitLoss = this.createRowForParent(
+      { value: `Profit / Loss`, disabled: true },
+      this.createCellsForMonth({ isNumber: true, disabled: true }
+
+      ));
     return profitLoss.map((item, index) => {
       if (index < profitLoss.length - this.months().length) {
         return item
@@ -188,15 +207,15 @@ export class AppService {
   })
 
   openingBalance = computed(() => {
-    let openingBalance = this.createTotalRow(`Opening Balance`);
-    let curOpeningBalance = 0;
+    let openingBalance = this.createRowForParent(
+      { value: `Opening Balance`, disabled: true },
+      this.createCellsForMonth({ isNumber: true, disabled: true }
+      ));
 
     return openingBalance.map((item, index) => {
-
       if (index < openingBalance.length - this.months().length) {
         return item
       }
-
       return {
         ...item,
         value: (index === openingBalance.length - this.months().length) ? 0 : this.closingBalance()[index - 1].value
@@ -205,17 +224,18 @@ export class AppService {
   })
 
   closingBalance = computed(() => {
-    let closingBalance = this.createTotalRow(`Closing Balance`);
-    let curClosingBalance = 0;
+    let closingBalance = this.createRowForParent(
+      { value: `Closing Balance`, disabled: true },
+      this.createCellsForMonth({ isNumber: true, disabled: true }
+      ));
 
+    let curClosingBalance = 0;
     return closingBalance.map((item, index) => {
 
       if (index < closingBalance.length - this.months().length) {
         return item
       }
-
       curClosingBalance += Number(this.totalsIncomes()[index].value) - Number(this.totalsExpenses()[index].value);
-
       return {
         ...item,
         value: curClosingBalance
@@ -223,54 +243,40 @@ export class AppService {
     })
   })
 
-  moveArrow = signal<IMove | null>(null)
 
-  updateMoveArrow(move: IMove) {
-    this.moveArrow.update(() => move);
-  }
 
-  // applyAll = signal<string>('');
-  applyValueAllCell(applyAll: string) {
-    // this.applyAll.update(() => applyAll);
-
+  updateCellsOfMonth(cell: ICell) {
     this.incomes.update((items => {
-      return items.map((itemParent, indexParent) => {
-        return itemParent.map((itemRow, indexRow) => {
-          return itemRow.map((itemCell, indexCell) => {
-            if (indexCell < itemRow.length - this.months().length) {
-              return itemCell
-            }
+      return items.map((parentMap, indexParent) => {
+        return parentMap.map((rowMap, indexRow) => {
+          return rowMap.map((cellMap, indexCell) => {
 
-            return {
-              ...itemCell,
-              value: applyAll
-            }
+            return cellMap.isCellOfMonth ?
+              {
+                ...cellMap,
+                value: cell.value
+              } :
+              cellMap
           })
         })
       });
     }))
 
     this.expenses.update((items => {
-      return items.map((itemParent, indexParent) => {
-        return itemParent.map((itemRow, indexRow) => {
-          return itemRow.map((itemCell, indexCell) => {
-            if (indexCell < itemRow.length - this.months().length) {
-              return itemCell
-            }
-            return {
-              ...itemCell,
-              value: applyAll
-            }
+      return items.map((parentMap, indexParent) => {
+        return parentMap.map((rowMap, indexRow) => {
+          return rowMap.map((cellMap, indexCell) => {
+            return cellMap.isCellOfMonth ?
+              {
+                ...cellMap,
+                value: cell.value
+              } :
+              cellMap
           })
         })
       });
     }))
 
-  }
-
-  cellRightClick = signal<IRightClick | null>(null)
-  updateCellRightClick(rightClick: IRightClick | null) {
-    this.cellRightClick.update(() => rightClick);
   }
 
   deleteRowOfParentAtIndex(indexParent: number, indexRow: number) {
@@ -305,44 +311,30 @@ export class AppService {
     }
   }
 
-  createCategoryRow(name = ''): ICell[] {
+  createCellsForMonth(cell?: Partial<ICell>): ICell[] {
+    return this.months().map(elMonthYear => {
+      return this.cellService.create(cell)
+    })
+  }
+
+  createRowForParent(
+    cell?: Partial<ICell>,
+    cellOfMonths?: ICell[]
+  ): ICell[] {
+    cellOfMonths = cellOfMonths ? cellOfMonths : this.createCellsForMonth({ isNumber: true, edit: true })
     return [
-      {
-        value: name,
-        isNumber: false,
-        edit: true
-      },
-      ...this.months().map(elMonthYear => {
-        return {
-          value: null,
-          isNumber: true,
-          edit: true
-        }
-      })]
+      this.cellService.create(cell),
+      ...cellOfMonths
+    ]
   }
 
   createParentCategoryRows(): Array<ICell[]> {
     return [
-      this.createCategoryRow(),
-      this.createCategoryRow(),
-      this.createCategoryRow(),
+      this.createRowForParent({ edit: true }, this.createCellsForMonth({ isNumber: true, disabled: true })),
+      this.createRowForParent({ edit: true }, this.createCellsForMonth({ isNumber: true, isCellOfMonth: true, edit: true })),
+      this.createRowForParent({ edit: true }, this.createCellsForMonth({ isNumber: true, isCellOfMonth: true, edit: true })),
+      this.createRowForParent({ edit: true }, this.createCellsForMonth({ isNumber: true, isCellOfMonth: true, edit: true })),
     ]
-  }
-
-  createTotalRow(name = ''): ICell[] {
-    return [
-      {
-        value: name,
-        isNumber: false,
-        edit: false
-      },
-      ...this.months().map(elMonthYear => {
-        return {
-          value: null,
-          isNumber: true,
-          edit: false
-        }
-      })]
   }
 
 
@@ -367,7 +359,11 @@ export class AppService {
       items => items.map((item, index) => {
 
         let addedCategory = [...item];
-        addedCategory.splice(indexRow, 0, this.createCategoryRow())
+        addedCategory.splice(
+          indexRow, 0,
+          this.createRowForParent({ edit: true },
+            this.createCellsForMonth({ isNumber: true, isCellOfMonth: true, edit: true }))
+        )
 
         return indexParentOfIncome === index ? addedCategory : item;
       })
@@ -431,7 +427,11 @@ export class AppService {
       items => items.map((item, index) => {
 
         let addedCategory = [...item];
-        addedCategory.splice(indexRow, 0, this.createCategoryRow())
+        addedCategory.splice(
+          indexRow,
+          0,
+          this.createRowForParent({ edit: true }, this.createCellsForMonth({ isNumber: true, isCellOfMonth: true, edit: true }))
+        )
 
         return indexParentExpenses === index ? addedCategory : item;
       })

@@ -1,4 +1,4 @@
-import { AppService } from './../../app.service';
+import { CellService } from './cell.service';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, ViewChild, effect, model, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 export interface ICell {
   value: any;
   isNumber: boolean;
+  isCellOfMonth: boolean,
+  disabled: boolean,
   edit: boolean;
   position?: {
     indexParent: number,
@@ -34,7 +36,9 @@ export interface IRightClick {
 })
 export class CellComponent {
 
-  constructor(private appService: AppService, private elementRef: ElementRef) {
+  constructor(
+    private cellService: CellService,
+  ) {
 
   }
 
@@ -44,22 +48,12 @@ export class CellComponent {
 
   // inputCellViewChild = viewChild<ElementRef>(`inputCell`)
   @ViewChild(`inputCell`) inputCellViewChild!: ElementRef;
-  // @ViewChild(`menu`) menu!: ElementRef;
 
   @HostListener('document:click', ['$event'])
   clickout(event: any) {
-    this.appService.updateCellRightClick(null);
-    // if (!this.elementRef.nativeElement.contains(event.target)) {
-    //   this.menu.nativeElement.style.display = 'none';
-    // }
-  }
+    this.cellService.updateCellRightClick(null);
 
-  // @HostListener('document:contextmenu', ['$event'])
-  // rightClickout(event: any) {
-  //   if (!this.elementRef.nativeElement.contains(event.target)) {
-  //     this.menu.nativeElement.style.display = 'none';
-  //   }
-  // }
+  }
 
   effectInput = effect(() => {
     this.cell.update((item) => ({ ...item, value: this.input() }))
@@ -67,18 +61,18 @@ export class CellComponent {
 
 
   focus() {
+    console.log(`focus`);
     this.inputCellViewChild?.nativeElement.focus();
   }
 
   onKeyDown(evt: KeyboardEvent) {
-
     const key = evt.key;
     if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
-      this.appService.updateMoveArrow({ cell: this.cell(), action: key })
+      this.cellService.updateMoveArrow({ cell: this.cell(), action: key })
     } else {
 
       if (key == 'Enter') {
-        this.appService.updateMoveArrow({ cell: this.cell(), action: 'ArrowDown' })
+        this.cellService.updateMoveArrow({ cell: this.cell(), action: 'ArrowDown' })
         return;
       }
 
@@ -90,9 +84,11 @@ export class CellComponent {
   }
 
   onRightClick(evt: PointerEvent) {
-    evt.preventDefault();
-    evt.stopPropagation();
-    this.appService.updateCellRightClick({ cell: this.cell(), clickPosition: { pageX: evt.pageX, pageY: evt.pageY } });
+    if (this.cell().edit) {
+      evt.preventDefault();
+      evt.stopPropagation();
+      this.cellService.updateCellRightClick({ cell: this.cell(), clickPosition: { pageX: evt.pageX, pageY: evt.pageY } });
+    }
   }
 
   onChangeEditMode() {

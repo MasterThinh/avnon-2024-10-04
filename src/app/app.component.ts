@@ -7,6 +7,7 @@ import { RowComponent } from './components/row/row.component';
 import { ParentCategoryComponent } from './components/parent-category/parent-category.component';
 import { CellComponent, ICell } from './components/cell/cell.component';
 import { FormsModule } from '@angular/forms';
+import { CellService } from './components/cell/cell.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,10 @@ import { FormsModule } from '@angular/forms';
 })
 export class AppComponent implements OnInit, AfterViewInit {
 
-  constructor(private appService: AppService) {
+  constructor(
+    private appService: AppService,
+    private cellService: CellService
+  ) {
   }
 
   fromDate = this.appService.fromDate;
@@ -35,7 +39,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   openingBalance = this.appService.openingBalance;
   closeingBalance = this.appService.closingBalance;
 
-  cellRightClick = this.appService.cellRightClick;
+  cellRightClick = this.cellService.cellRightClick;
+  moveArrow = this.cellService.moveArrow;
 
   effectRightClick = effect(() => {
     const cellRightClick = this.cellRightClick();
@@ -60,20 +65,21 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   effectMoveArrow = effect(() => {
     this.handleFocusCell();
-  })
+    this.cellService.updateMoveArrow(null)
+  }, { allowSignalWrites: true })
 
   @ViewChild(`rightClickMenu`) rightClickMenu!: ElementRef;
   @ViewChildren(ParentCategoryComponent) parentCategoryChildren!: QueryList<ParentCategoryComponent>;
 
   @HostListener('document:contextmenu', ['$event'])
   rightClickout(event: any) {
-    this.appService.updateCellRightClick(null);
+    this.cellService.updateCellRightClick(null);
   }
 
 
   private handleFocusCell() {
-    const moveAction = this.appService.moveArrow()?.action;
-    const cell = this.appService.moveArrow()?.cell
+    const moveAction = this.moveArrow()?.action;
+    const cell = this.moveArrow()?.cell
 
     switch (moveAction) {
       case 'ArrowLeft':
@@ -97,115 +103,112 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   private moveUp(cell: ICell) {
 
-    let parentUp: ParentCategoryComponent;
-    let rowUp: RowComponent;
-    let cellRight: CellComponent;
-
+    let cellUp!: CellComponent;
     let { indexParent, indexRow, indexCell } = { ...cell.position };
 
+    let rowLengthOfParent = this.getParent(indexParent as number).rowChildren.length;
+    let cellLengthOfRow = this.getRow(indexParent as number, indexRow as number).cellChildren.length;
+
     if (indexParent !== undefined && indexRow !== undefined && indexCell !== undefined) {
-
-      rowUp = this.getRow(indexParent, indexRow - 1);
-      cellRight = this.getCell(indexParent, indexRow - 1, indexCell)
-      if (cellRight) {
-        cellRight.focus()
-        return;
-      }
-
-
-      if (indexParent - 1 >= 0) {
-        parentUp = this.getParent(indexParent - 1);
-        rowUp = this.getRow(indexParent - 1, 0);
-        cellRight = this.getCell(indexParent - 1, parentUp.rowChildren.length - 1, indexCell)
-        if (cellRight) {
-          cellRight.focus()
-          return;
+      do {
+        if (indexRow > 0) {
+          indexRow--;
+        } else {
+          indexParent--;
+          indexRow = rowLengthOfParent - 1;
         }
+        cellUp = this.getCell(indexParent, indexRow, indexCell);
+
+      } while (cellUp && cellUp.cell().disabled)
+
+      if (cellUp) {
+        cellUp.focus();
       }
     }
   }
 
   private moveDown(cell: ICell) {
-    let cellDown: CellComponent;
+    let cellDown!: CellComponent;
     let { indexParent, indexRow, indexCell } = { ...cell.position };
 
+    let rowLengthOfParent = this.getParent(indexParent as number).rowChildren.length;
+    // let cellLengthOfRow = this.getRow(indexParent as number, indexRow as number).cellChildren.length;      
+
     if (indexParent !== undefined && indexRow !== undefined && indexCell !== undefined) {
+      do {
+        if (indexRow < rowLengthOfParent - 1) {
+          indexRow++;
+        } else {
+          indexParent++;
+          indexRow = 0;
+        }
+        cellDown = this.getCell(indexParent, indexRow, indexCell);
 
-      cellDown = this.getCell(indexParent, indexRow + 1, indexCell)
-      if (cellDown) {
-        cellDown.focus()
-        return;
-      }
+      } while (cellDown && cellDown.cell().disabled)
 
-      cellDown = this.getCell(indexParent + 1, 0, indexCell)
       if (cellDown) {
-        cellDown.focus()
-        return;
+        cellDown.focus();
       }
     }
   }
 
   private moveLeft(cell: ICell) {
 
-    let parentUp: ParentCategoryComponent;
-    let rowUp: RowComponent;
-    let cellRight: CellComponent;
-
+    let cellLeft!: CellComponent;
     let { indexParent, indexRow, indexCell } = { ...cell.position };
 
+    let rowLengthOfParent = this.getParent(indexParent as number).rowChildren.length;
+    let cellLengthOfRow = this.getRow(indexParent as number, indexRow as number).cellChildren.length;
+
     if (indexParent !== undefined && indexRow !== undefined && indexCell !== undefined) {
-
-      cellRight = this.getCell(indexParent, indexRow, indexCell - 1)
-      if (cellRight) {
-        cellRight.focus()
-        return;
-      }
-
-      rowUp = this.getRow(indexParent, indexRow - 1);
-      cellRight = this.getCell(indexParent, indexRow - 1, rowUp?.cellChildren.length - 1)
-      if (cellRight) {
-        cellRight.focus()
-        return;
-      }
-
-
-      if (indexParent - 1 >= 0) {
-        parentUp = this.getParent(indexParent - 1);
-        rowUp = this.getRow(indexParent - 1, 0);
-        cellRight = this.getCell(indexParent - 1, parentUp.rowChildren.length - 1, rowUp.cellChildren.length - 1)
-        if (cellRight) {
-          cellRight.focus()
-          return;
+      do {
+        if (indexCell > 0) {
+          indexCell--
+        } else if (indexRow > 0) {
+          indexRow--;
+          indexCell = cellLengthOfRow - 1;
+        } else {
+          indexParent--;
+          indexRow = rowLengthOfParent - 1;
+          indexCell = cellLengthOfRow - 1;
         }
+        cellLeft = this.getCell(indexParent, indexRow, indexCell);
+
+      } while (cellLeft && cellLeft.cell().disabled)
+
+      if (cellLeft) {
+        cellLeft.focus();
       }
     }
   }
 
   private moveRight(cell: ICell) {
 
-    let cellRight: CellComponent;
+    let cellRight!: CellComponent;
     let { indexParent, indexRow, indexCell } = { ...cell.position };
 
+    let rowLengthOfParent = this.getParent(indexParent as number).rowChildren.length;
+    let cellLengthOfRow = this.getRow(indexParent as number, indexRow as number).cellChildren.length;
+
     if (indexParent !== undefined && indexRow !== undefined && indexCell !== undefined) {
+      do {
+        if (indexCell < cellLengthOfRow - 1) {
+          indexCell++
+        } else if (indexRow < rowLengthOfParent - 1) {
+          indexRow++;
+          indexCell = 0;
+        } else {
+          indexParent++;
+          indexRow = 0;
+          indexCell = 0;
+        }
+        cellRight = this.getCell(indexParent, indexRow, indexCell);
 
-      cellRight = this.getCell(indexParent, indexRow, indexCell + 1)
+      } while (cellRight && cellRight.cell().disabled)
+
       if (cellRight) {
-        cellRight.focus()
-        return;
+        cellRight.focus();
       }
-
-      cellRight = this.getCell(indexParent, indexRow + 1, 0)
-      if (cellRight) {
-        cellRight.focus()
-        return;
-      }
-
-      cellRight = this.getCell(indexParent + 1, 0, 0)
-      if (cellRight) {
-        cellRight.focus()
-        return;
-      }
-
     }
   }
 
@@ -243,7 +246,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   onApplyAll() {
     this.rightClickMenu.nativeElement.style.display = 'none';
     const cellRightClick = this.cellRightClick();
-    this.appService.applyValueAllCell(cellRightClick?.cell.value);
+    this.appService.updateCellsOfMonth(cellRightClick?.cell as ICell);
   }
 
   onDeleteRow() {
