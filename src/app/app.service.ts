@@ -245,37 +245,67 @@ export class AppService {
 
 
 
-  updateCellsOfMonth(cell: ICell) {
-    this.incomes.update((items => {
-      return items.map((parentMap, indexParent) => {
-        return parentMap.map((rowMap, indexRow) => {
-          return rowMap.map((cellMap, indexCell) => {
+  updateAllCellsForRow(cell: ICell) {
 
-            return cellMap.isCellOfMonth ?
-              {
-                ...cellMap,
-                value: cell.value
-              } :
-              cellMap
-          })
-        })
-      });
-    }))
+    // this.expenses.update((items => {
+    //   return items.map((parentMap, indexParent) => {
+    //     return parentMap.map((rowMap, indexRow) => {
+    //       return rowMap.map((cellMap, indexCell) => {
+    //         return cellMap.isCellOfMonth ?
+    //           {
+    //             ...cellMap,
+    //             value: cell.value
+    //           } :
+    //           cellMap
+    //       })
+    //     })
+    //   });
+    // }))
 
-    this.expenses.update((items => {
-      return items.map((parentMap, indexParent) => {
-        return parentMap.map((rowMap, indexRow) => {
-          return rowMap.map((cellMap, indexCell) => {
-            return cellMap.isCellOfMonth ?
-              {
-                ...cellMap,
-                value: cell.value
-              } :
-              cellMap
+    // const { indexParent, indexRow, indexCell } = { ...cell.position };
+    const indexParentOfCell = cell.position?.indexParent as number;
+    const indexRowOfCell = cell.position?.indexRow as number;
+
+    if (indexParentOfCell < this.incomes().length) {
+      this.incomes.update((items => {
+        return items.map((parentMap, indexParentMap) => {
+          return parentMap.map((rowMap, indexRowMap) => {
+            if (indexParentMap === indexParentOfCell && indexRowMap === indexRowOfCell) {
+              return rowMap.map((cellMap, indexCellMap) => {
+                return cellMap.isCellOfMonth ?
+                  {
+                    ...cellMap,
+                    value: cell.value
+                  } :
+                  cellMap
+              })
+            }
+            return rowMap
           })
-        })
-      });
-    }))
+        });
+      }))
+    } else {
+
+      const indexParentOfCellExpendses = indexParentOfCell % this.incomes().length;
+
+      this.expenses.update((items => {
+        return items.map((parentMap, indexParentMap) => {
+          return parentMap.map((rowMap, indexRowMap) => {
+            if (indexParentMap === indexParentOfCellExpendses && indexRowMap === indexRowOfCell) {
+              return rowMap.map((cellMap, indexCellMap) => {
+                return cellMap.isCellOfMonth ?
+                  {
+                    ...cellMap,
+                    value: cell.value
+                  } :
+                  cellMap
+              })
+            }
+            return rowMap
+          })
+        });
+      }))
+    }
 
   }
 

@@ -116,18 +116,18 @@
   class="font-normal absolute rounded-md border-2 bg-[#FAFAFA] text-center z-[1000000] text-xs hidden">
   <ul>
     @if(cellRightClick()?.cell?.isNumber) {
-    <li (click)="onApplyAll()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Apply All
+    <li (click)="onApplyAllCellsForRow()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Apply all cells for row
     </li>
     }
-    <li (click)="onInsertRow()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Insert Row
+    <li (click)="onInsertRow()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Insert row
     </li>
     <li (click)="onInsertParent()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Insert
-      Parent</li>
+      parent</li>
     @if(cellRightClick()?.cell?.position?.indexRow !== 0) {
-      <li (click)="onDeleteRow()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Delete Row
+      <li (click)="onDeleteRow()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Delete row
       </li>
     }
     <li (click)="onDeleteParent()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Delete
-      Parent</li>
+      parent</li>
   </ul>
 </div>

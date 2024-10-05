@@ -243,10 +243,10 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   }
 
-  onApplyAll() {
+  onApplyAllCellsForRow() {
     this.rightClickMenu.nativeElement.style.display = 'none';
     const cellRightClick = this.cellRightClick();
-    this.appService.updateCellsOfMonth(cellRightClick?.cell as ICell);
+    this.appService.updateAllCellsForRow(cellRightClick?.cell as ICell);
   }
 
   onDeleteRow() {
