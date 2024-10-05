@@ -1,6 +1,6 @@
 import { Injectable, computed, effect, signal } from '@angular/core';
 import moment from 'moment';
-import { ICell, IMove } from './components/cell/cell.component';
+import { ICell, IMove, IRightClick } from './components/cell/cell.component';
 
 @Injectable({
   providedIn: 'root'
@@ -266,6 +266,11 @@ export class AppService {
       });
     }))
 
+  }
+
+  cellRightClick = signal<IRightClick | null>(null)
+  updateCellRightClick(rightClick: IRightClick | null) {
+    this.cellRightClick.update(() => rightClick);
   }
 
   deleteRowOfParentAtIndex(indexParent: number, indexRow: number) {

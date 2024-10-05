@@ -1,4 +1,4 @@
-import { Component, QueryList, ViewChildren, effect, input, model, output, signal, viewChildren } from '@angular/core';
+import { Component, QueryList, ViewChildren, model } from '@angular/core';
 import { CellComponent, ICell } from '../cell/cell.component';
 import { CommonModule } from '@angular/common';
 @Component({
@@ -21,18 +21,5 @@ export class RowComponent {
   }
 
   @ViewChildren(CellComponent) cellChildren!: QueryList<CellComponent>;
-
-  // add = input<boolean>(false)
-  // addCategory = output();
-  // remove = input<boolean>(false)
-  // removeCategory = output();
-
-  // onAddCategory() {
-  //   this.addCategory.emit()
-  // }
-
-  // onRemoveCategory() {
-  //   this.removeCategory.emit()
-  // }
 
 }

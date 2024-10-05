@@ -1,10 +1,10 @@
-<div class="h-full" (contextmenu)="onRightClick($any($event))" (click)="disappearContext()">
-  <input #inputCell class="w-full h-full px-2 outline-blue-600" [disabled]="!cell().edit" [class.text-right]="cell().isNumber"
-  type="text" [readonly]="!isEditing()" (blur)="onChangeViewMode()" [(ngModel)]="input"
-  (keydown.enter)="onChangeEditMode()" [placeholder]="cell().isNumber ? '' : 'Name'" (keydown)="onKeyDown($any($event))"
-  (dblclick)="onChangeEditMode()">
+<div class="h-full" (contextmenu)="onRightClick($any($event))">
+  <input #inputCell class="w-full h-full px-2 outline-blue-600" [disabled]="!cell().edit"
+    [class.text-right]="cell().isNumber" type="text" [readonly]="!isEditing()" (blur)="onChangeViewMode()"
+    [(ngModel)]="input" [placeholder]="cell().isNumber ? '' : 'Name'"
+    (keydown)="onKeyDown($any($event))" (dblclick)="onChangeEditMode()">
 
-  <div #menu (click)="$event.stopPropagation()" class="font-normal absolute rounded-md border-2 bg-[#FAFAFA] w-44 text-center z-[1000000] text-sm hidden">
+  <!-- <div #menu (click)="$event.stopPropagation()" class="font-normal absolute rounded-md border-2 bg-[#FAFAFA] w-44 text-center z-[1000000] text-sm hidden">
     <ul>
       @if(cell().isNumber) {
         <li (click)="onApplyAll()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Apply All</li>
@@ -13,9 +13,6 @@
       <li (click)="onInsertParent()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Insert Parent</li>
       <li (click)="onDeleteRow()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Delete Row</li>
       <li (click)="onDeleteParent()" class="px-4 py-1 border-b-2 cursor-pointer hover:bg-[#D9D9D9] transition-all">Delete Parent</li>
-
     </ul>
-  </div>
-
+  </div> -->
 </div>
-

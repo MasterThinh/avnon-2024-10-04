@@ -1,5 +1,5 @@
 import { AppService } from './../../app.service';
-import { Component, QueryList, ViewChildren, input, model, output } from '@angular/core';
+import { Component, QueryList, ViewChildren, model } from '@angular/core';
 import { CellComponent, ICell } from '../cell/cell.component';
 import { RowComponent } from '../row/row.component';
 
@@ -17,24 +17,7 @@ export class ParentCategoryComponent {
   parentCategory = model.required<Array<ICell[]>>()
   subTotalsParentCategory = model.required<ICell[]>()
 
-  // removeParent = input<boolean>(false)
-  // removeParentCategory = output();
-
-  // rowChildren = viewChildren<RowComponent>(RowComponent);
   @ViewChildren(`row`) rowChildren!:  QueryList<RowComponent>;
-
-
-  // onAddCategoryAtIndex(indexItemCategory: number) {
-  //   this.addCategory.emit(indexItemCategory)
-  // }
-
-  // onRemoveCategoryAtIndex(indexItemCategory: number) {
-  //   this.removeCategory.emit(indexItemCategory)
-  // }
-
-  // onRemoveParentCategoryAtIndex() {
-  //   this.removeParentCategory.emit()
-  // }
 
   onRowIncomeChange(evt: ICell[], indexItemCategory: number) {
     this.parentCategory.update(items => {

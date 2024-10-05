@@ -1,16 +1,3 @@
-<!-- <td disabled="true" class="text-center border border-slate-300">
-
-  @if (add()) {
-  <button tabindex="-1" (click)="onRemoveCategory()"
-    class="w-8 bg-red-500 hover:bg-red-700 text-white font-bold px-1 mx-1 rounded-sm">-</button>
-  }
-
-  @if (remove()) {
-  <button tabindex="-1" (click)="onAddCategory()"
-    class="w-8 bg-green-500 hover:bg-green-700 text-white font-bold px-1 mx-1 rounded-sm">+</button>
-  }
-
-</td> -->
 @for (itemCell of row(); track indexCell; let indexCell = $index) {
 <td class="border border-slate-300 text-right">
   <app-cell

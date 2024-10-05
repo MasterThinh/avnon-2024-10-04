@@ -1,6 +1,6 @@
 import { AppService } from './app.service';
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit, QueryList, ViewChildren, effect } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChild, ViewChildren, effect } from '@angular/core';
 
 import { RouterOutlet } from '@angular/router';
 import { RowComponent } from './components/row/row.component';
@@ -35,7 +35,20 @@ export class AppComponent implements OnInit, AfterViewInit {
   openingBalance = this.appService.openingBalance;
   closeingBalance = this.appService.closingBalance;
 
-  @ViewChildren(ParentCategoryComponent) parentCategoryChildren!: QueryList<ParentCategoryComponent>;
+  cellRightClick = this.appService.cellRightClick;
+
+  effectRightClick = effect(() => {
+    const cellRightClick = this.cellRightClick();
+    if (cellRightClick) {
+      this.rightClickMenu.nativeElement.style.display = 'block';
+      this.rightClickMenu.nativeElement.style.top = cellRightClick.clickPosition.pageY + 'px';
+      this.rightClickMenu.nativeElement.style.left = cellRightClick.clickPosition.pageX + 'px';
+    } else {
+      this.rightClickMenu.nativeElement.style.display = 'none';
+    }
+  })
+
+
 
   effectMonth = effect(() => {
     if (this.months().length > 0) {
@@ -48,6 +61,15 @@ export class AppComponent implements OnInit, AfterViewInit {
   effectMoveArrow = effect(() => {
     this.handleFocusCell();
   })
+
+  @ViewChild(`rightClickMenu`) rightClickMenu!: ElementRef;
+  @ViewChildren(ParentCategoryComponent) parentCategoryChildren!: QueryList<ParentCategoryComponent>;
+
+  @HostListener('document:contextmenu', ['$event'])
+  rightClickout(event: any) {
+    this.appService.updateCellRightClick(null);
+  }
+
 
   private handleFocusCell() {
     const moveAction = this.appService.moveArrow()?.action;
@@ -108,12 +130,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     let { indexParent, indexRow, indexCell } = { ...cell.position };
 
     if (indexParent !== undefined && indexRow !== undefined && indexCell !== undefined) {
-
-      // cellDown = this.getCell(indexParent, indexRow, indexCell + 1)
-      // if (cellRight) {
-      //   cellRight.focus()
-      //   return;
-      // }
 
       cellDown = this.getCell(indexParent, indexRow + 1, indexCell)
       if (cellDown) {
@@ -219,43 +235,39 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.appService.updateIncomesByIndex(evt, indexItemCategory);
   }
 
-  // onAddIncomeCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-  //   this.appService.insertRowOfParentIncomeAtIndex(indexParentCategory, indexItemCategory)
-  // }
-
-  // onRemoveInComeCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-  //   this.appService.removeRowOfParentIncomeAtIndex(indexParentCategory, indexItemCategory)
-  // }
-
-  // onRemoveInComeParentCategoryAtIndex(indexParentCategory: number) {
-  //   this.appService.removeIncomeParentCategoryAtIndex(indexParentCategory)
-  // }
-
-  // onAddIncomeParentCategory() {
-  //   this.appService.addIncomeParentCategory();
-  // }
-
-  // Expenses
-
   onExpensesParentCategoryChange(evt: Array<ICell[]>, indexItemCategory: number) {
     this.appService.updateExpensesByIndex(evt, indexItemCategory);
 
   }
 
-  // onAddExpensesCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-  //   this.appService.insertRowOfParentExpensesAtIndex(indexParentCategory, indexItemCategory)
-  // }
+  onApplyAll() {
+    this.rightClickMenu.nativeElement.style.display = 'none';
+    const cellRightClick = this.cellRightClick();
+    this.appService.applyValueAllCell(cellRightClick?.cell.value);
+  }
 
-  // onRemoveExpensesCategoryAtIndex(indexItemCategory: number, indexParentCategory: number) {
-  //   this.appService.removeRowOfParentExpensesAtIndex(indexParentCategory, indexItemCategory)
-  // }
+  onDeleteRow() {
+    this.rightClickMenu.nativeElement.style.display = 'none';
+    const cellRightClick = this.cellRightClick();
+    this.appService.deleteRowOfParentAtIndex(cellRightClick?.cell.position?.indexParent as number, cellRightClick?.cell.position?.indexRow as number);
+  }
 
-  // onRemoveExpensesParentCategoryAtIndex(indexParentCategory: number) {
-  //   this.appService.removeExpensesParentCategoryAtIndex(indexParentCategory)
-  // }
+  onDeleteParent() {
+    this.rightClickMenu.nativeElement.style.display = 'none';
+    const cellRightClick = this.cellRightClick();
+    this.appService.deleteParentAtIndex(cellRightClick?.cell.position?.indexParent as number);
+  }
 
-  // onAddExpensesParentCategory() {
-  //   this.appService.addExpensesParentCategory(1);
-  // }
+  onInsertRow() {
+    this.rightClickMenu.nativeElement.style.display = 'none';
+    const cellRightClick = this.cellRightClick();
+    this.appService.insertRowOfParentAtIndex(cellRightClick?.cell.position?.indexParent as number, cellRightClick?.cell.position?.indexRow as number);
+  }
+
+  onInsertParent() {
+    this.rightClickMenu.nativeElement.style.display = 'none';
+    const cellRightClick = this.cellRightClick();
+    this.appService.insertParentAtIndex(cellRightClick?.cell.position?.indexParent as number);
+  }
 
 }

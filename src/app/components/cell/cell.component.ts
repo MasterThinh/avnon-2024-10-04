@@ -19,6 +19,12 @@ export interface IMove {
   action: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
 }
 
+export interface IRightClick {
+  cell: ICell;
+  clickPosition: { pageX: number, pageY: number }
+}
+
+
 @Component({
   selector: 'app-cell',
   standalone: true,
@@ -38,24 +44,24 @@ export class CellComponent {
 
   // inputCellViewChild = viewChild<ElementRef>(`inputCell`)
   @ViewChild(`inputCell`) inputCellViewChild!: ElementRef;
-  @ViewChild(`menu`) menu!: ElementRef;
+  // @ViewChild(`menu`) menu!: ElementRef;
 
   @HostListener('document:click', ['$event'])
   clickout(event: any) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.menu.nativeElement.style.display = 'none';
-    }
+    this.appService.updateCellRightClick(null);
+    // if (!this.elementRef.nativeElement.contains(event.target)) {
+    //   this.menu.nativeElement.style.display = 'none';
+    // }
   }
 
-  @HostListener('document:contextmenu', ['$event'])
-  rightClickout(event: any) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.menu.nativeElement.style.display = 'none';
-    }
-  }
+  // @HostListener('document:contextmenu', ['$event'])
+  // rightClickout(event: any) {
+  //   if (!this.elementRef.nativeElement.contains(event.target)) {
+  //     this.menu.nativeElement.style.display = 'none';
+  //   }
+  // }
 
   effectInput = effect(() => {
-    this.menu.nativeElement.style.display = 'none';
     this.cell.update((item) => ({ ...item, value: this.input() }))
   }, { allowSignalWrites: true })
 
@@ -70,6 +76,12 @@ export class CellComponent {
     if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
       this.appService.updateMoveArrow({ cell: this.cell(), action: key })
     } else {
+
+      if (key == 'Enter') {
+        this.appService.updateMoveArrow({ cell: this.cell(), action: 'ArrowDown' })
+        return;
+      }
+
       if (this.isEditing() === false && key !== 'Tab') {
         this.isEditing.update(() => true);
         this.input.update(() => '')
@@ -79,13 +91,8 @@ export class CellComponent {
 
   onRightClick(evt: PointerEvent) {
     evt.preventDefault();
-    this.menu.nativeElement.style.display = 'block';
-    this.menu.nativeElement.style.top = evt.pageY + 'px';
-    this.menu.nativeElement.style.left = evt.pageX + 'px';
-  }
-
-  disappearContext() {
-    this.menu.nativeElement.style.display = 'none';
+    evt.stopPropagation();
+    this.appService.updateCellRightClick({ cell: this.cell(), clickPosition: { pageX: evt.pageX, pageY: evt.pageY } });
   }
 
   onChangeEditMode() {
@@ -96,29 +103,8 @@ export class CellComponent {
     this.isEditing.update((item) => (false));
   }
 
-  onApplyAll() {
-    this.menu.nativeElement.style.display = 'none';
-    this.appService.applyValueAllCell(this.input());
-  }
 
-  onDeleteRow() {
-    this.menu.nativeElement.style.display = 'none';
-    this.appService.deleteRowOfParentAtIndex(this.cell().position?.indexParent as number, this.cell().position?.indexRow as number);
-  }
 
-  onDeleteParent() {
-    this.menu.nativeElement.style.display = 'none';
-    this.appService.deleteParentAtIndex(this.cell().position?.indexParent as number);
-  }
 
-  onInsertRow() {
-    this.menu.nativeElement.style.display = 'none';
-    this.appService.insertRowOfParentAtIndex(this.cell().position?.indexParent as number, this.cell().position?.indexRow as number);
-  }
-
-  onInsertParent() {
-    this.menu.nativeElement.style.display = 'none';
-    this.appService.insertParentAtIndex(this.cell().position?.indexParent as number);
-  }
 
 }
